@@ -10,18 +10,18 @@ public class MEMOIRE {
 
     public byte read(short adresse) {
         int adr = adresse & 0xFFFF;
-        if (adr <= 0x03FF) {        // ✅ RAM : 0000–03FF
+        if (adr <= 0x03FF) {        
             return ram.read(adresse);
-        } else if (adr >= 0xFC00) { // ✅ ROM : FC00–FFFF
+        } else if (adr >= 0xFC00) { 
             return rom.read(adresse);
         } else {
-            return (byte) 0x00;     // zone vide : 0400–FBFF
+            return (byte) 0x00;    
         }
     }
 
     public void write(short adresse, byte valeur) {
         int adr = adresse & 0xFFFF;
-        if (adr <= 0x03FF) {        // ✅ écriture uniquement en RAM
+        if (adr <= 0x03FF) {        
             ram.write(adresse, valeur);
         }
     }
