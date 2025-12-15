@@ -1,12 +1,12 @@
 package ao.project;
 
-public class CPU {
+public class Cpu {
 
     private Register reg;
-    private MEMOIRE mem;
+    private Memoire mem;
     private boolean halted = false;
 
-    public CPU(MEMOIRE mem, Register reg) {
+    public Cpu(Memoire mem, Register reg) {
         this.mem = mem;
         this.reg = reg;
     }
@@ -51,10 +51,23 @@ public class CPU {
             case 0xC6: reg.setB(fetch8()); reg.updateNZFlags8(reg.getB()); break;
             case 0xD6: reg.setB(mem.read((short) fetch8())); reg.updateNZFlags8(reg.getB()); break;
             case 0xF6: reg.setB(mem.read((short) fetch16())); reg.updateNZFlags8(reg.getB()); break;
-
+            // LDX
+            case 0x8E: { int value = fetch16(); reg.setX(value);reg.updateNZFlags16(value); break;}
+            case 0xBE: { int addr = fetch16(); int value = mem.read((short) addr); reg.setX(value); reg.updateNZFlags16(value); break; }
+            // LDY
+            case 0x10: {int op2 = fetch8(); switch (op2) {
+                case 0x8E: {  int value = fetch16();reg.setY(value); reg.setY(value); reg.updateNZFlags16(value);break;}
+                case 0xBE: {int addr = fetch16(); int value = mem.read((short) addr);reg.setY(value); reg.updateNZFlags16(value); break;}
+                default:
+                    System.err.println("Unknown 0x10 opcode " + String.format("%02X", op2));
+                    halted = true; }
+                break;}
             // STA
             case 0x97: mem.write((short) fetch8(), (byte) reg.getA()); break;
             case 0xB7: mem.write((short) fetch16(), (byte) reg.getA()); break;
+            // STB
+            case 0xD7: { int addr = (reg.getDP() << 8) | fetch8(); mem.write((short) addr, (byte) reg.getB()); reg.updateNZFlags8(reg.getB()); break;}
+            case 0xF7: { int addr = fetch16(); mem.write((short) addr, (byte) reg.getB()); reg.updateNZFlags8(reg.getB());break;}
 
             // ADD A
             case 0x8B: addA(fetch8()); break;
@@ -65,6 +78,9 @@ public class CPU {
             case 0xCB: addB(fetch8()); break;
             case 0xDB: addB(mem.read((short) fetch8())); break;
             case 0xFB: addB(mem.read((short) fetch16())); break;
+            // ADDX
+            case 0x8F: { int value = fetch16();int x = reg.getX(); int res = (x + value) & 0xFFFF; reg.setX(res); reg.updateNZFlags16(res); reg.setFlagC(x + value > 0xFFFF);  break;}
+            case 0xBF: {int addr = fetch16(); int value = mem.read((short) addr); int x = reg.getX(); int res = (x + value) & 0xFFFF; reg.setX(res);  reg.updateNZFlags16(res);  reg.setFlagC(x + value > 0xFFFF);break;}
 
             // SUB A
             case 0x80: subA(fetch8()); break;
@@ -167,7 +183,7 @@ public class CPU {
         reg.updateNZFlags8(res);
         reg.setFlagC(reg.getB()>=val);
     }
-    public MEMOIRE getMem() {
+    public Memoire getMem() {
         return mem;
     }
     public Register getRegister() {

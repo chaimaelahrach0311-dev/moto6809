@@ -1,9 +1,9 @@
 package ao.project;
-public class MEMOIRE {
+public class Memoire {
     private ROM rom;
     private RAM ram;
 
-    public MEMOIRE(byte[] programme) {
+    public Memoire(byte[] programme) {
         this.rom = new ROM(programme);
         this.ram = new RAM();
     }

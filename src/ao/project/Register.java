@@ -9,6 +9,9 @@ public class Register {
     private int PC; // Program counter (16 bits)
     private int SP; // Stack pointer (16 bits)
     private int CC; // Condition Code Register
+    private int s;   // Stack System
+    private int u;   // Stack User
+    private int dp;   // Direct Page
 
     // Masques pour CCR
     private static final int CC_E = 0x80;
@@ -45,6 +48,16 @@ public class Register {
     public int getSP() { return SP; }
     public void setSP(int sp) { SP = sp & 0xFFFF; }
 
+    public int getS() { return s;}
+    public void setS(int s) {this.s = s;}
+
+    public int getU() { return u;}
+    public void setU(int u) {this.u = u;}
+
+    public int getDP() { return dp;}
+    public void setDP(int dp) {this.dp = dp; }
+
+
     public void setFlagC(boolean value) { if(value) CC |= CC_C; else CC &= ~CC_C; }
     public void setFlagZ(boolean value) { if(value) CC |= CC_Z; else CC &= ~CC_Z; }
     public void setFlagN(boolean value) { if(value) CC |= CC_N; else CC &= ~CC_N; }
@@ -80,6 +93,9 @@ public class Register {
         PC = 0xFC00; // PC start at ROM
         SP = 0xFFFF;
         CC = 0;
+        s = 0;
+        u = 0;
+        dp = 0;
         setFlagI(true);
         setFlagF(true);
     }
