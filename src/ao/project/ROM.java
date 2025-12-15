@@ -4,7 +4,7 @@ public class ROM {
     private byte[] memoire;
 
     public ROM(byte[] programme) {
-        int tailleROM = 1024; // 0xFC00–0xFFFF inclus
+        int tailleROM = 1024;
         memoire = new byte[tailleROM];
 
         // Remplir par défaut avec 0xFF
@@ -26,9 +26,9 @@ public class ROM {
     public byte read(short adresse) {
         int adr = adresse & 0xFFFF;
         if (adr >= 0xFC00 && adr <= 0xFFFF) {
-            int pos = adr - 0xFC00; // 0xFC00 → 0
+            int pos = adr - 0xFC00;
             return memoire[pos];
         }
-        return (byte) 0xFF; // hors ROM → 0xFF
+        return (byte) 0xFF;
     }
 }
