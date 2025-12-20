@@ -21,7 +21,7 @@ public class GUI {
     private static JButton runBtn;
     private static JButton stopBtn;
     private static JTextArea ramTextArea;
-    private static JTextArea romTextArea; // ✅ AJOUT
+    private static JTextArea romTextArea;
 
     public static void main(String[] args) {
         byte[] programmeVide = new byte[1024];
@@ -478,7 +478,7 @@ public class GUI {
 
         ramWindow.setVisible(true);
         ramWindow.toFront();
-        refreshRamDisplay(); // ✅ AJOUT : rafraîchir immédiatement
+        refreshRamDisplay();
     }
 
     private static void showRomWindow() {
@@ -488,7 +488,7 @@ public class GUI {
             romWindow.setSize(220, 300);
             romWindow.setLocation(950, 130);
 
-            romTextArea = new JTextArea(); // ✅ AJOUT
+            romTextArea = new JTextArea();
             romTextArea.setEditable(false);
             romTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             romTextArea.setBackground(Color.WHITE);
@@ -498,7 +498,7 @@ public class GUI {
 
         romWindow.setVisible(true);
         romWindow.toFront();
-        refreshRomDisplay(); // ✅ AJOUT : rafraîchir immédiatement
+        refreshRomDisplay();
     }
 
     private static void refreshRegisters() {
@@ -519,7 +519,7 @@ public class GUI {
     }
 
     private static void assemblerCode() {
-        System.out.println("✅ assemblerCode() appelé !");
+        System.out.println("assemblerCode() appelé !");
         try {
             String code = codeArea.getText();
             if (code == null || code.trim().isEmpty()) {
@@ -563,7 +563,7 @@ public class GUI {
                 }
             }
 
-            // ✅ Affichage debug
+
             System.out.println("ROM assemblée (" + addr + " octets) :");
             for (int i = 0; i < addr; i++) {
                 System.out.printf("%02X ", romContent[i] & 0xFF);
@@ -579,7 +579,7 @@ public class GUI {
             cpu.reset();
             refreshRegisters();
             refreshRamDisplay();
-            refreshRomDisplay(); // ✅ AJOUT
+            refreshRomDisplay();
 
             JOptionPane.showMessageDialog(null, "Assemblage réussi ! (" + addr + " octets)", "Succès", JOptionPane.INFORMATION_MESSAGE);
 
@@ -591,7 +591,7 @@ public class GUI {
         }
     }
 
-    // ✅ CORRIGÉ : Affichage RAM
+
 
 
 

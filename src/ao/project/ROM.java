@@ -24,8 +24,8 @@ public class ROM {
 
     public byte read(short adresse) {
         int adr = adresse & 0xFFFF;
-        if (adr >= 0xFC00 && adr <= 0xFFFF) {   // ✅ inclut 0xFFFF
-            int pos = adr - 0xFC00;             // 0xFC00 → 0, 0xFFFF → 1023
+        if (adr >= 0xFC00 && adr <= 0xFFFF) {
+            int pos = adr - 0xFC00;
             return memoire[pos];
         }
         return (byte) 0xFF; // hors ROM → 0xFF
