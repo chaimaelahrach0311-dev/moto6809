@@ -1,7 +1,7 @@
 package ao.project;
 
 public class Register {
-
+    private byte flags;
     private int A; // Accumulator A (8 bits)
     private int B; // Accumulator B (8 bits)
     private int X; // Index X (16 bits)
@@ -57,6 +57,15 @@ public class Register {
     public int getDP() { return dp;}
     public void setDP(int dp) {this.dp = dp; }
 
+    // GETTERS pour les flags
+    public boolean isFlagC() { return (CC & CC_C) != 0; }
+    public boolean isFlagZ() { return (CC & CC_Z) != 0; }
+    public boolean isFlagN() { return (CC & CC_N) != 0; }
+    public boolean isFlagV() { return (CC & CC_V) != 0; }
+    public boolean isFlagH() { return (CC & CC_H) != 0; }
+    public boolean isFlagI() { return (CC & CC_I) != 0; }
+    public boolean isFlagF() { return (CC & CC_F) != 0; }
+    public boolean isFlagE() { return (CC & CC_E) != 0; }
 
     public void setFlagC(boolean value) { if(value) CC |= CC_C; else CC &= ~CC_C; }
     public void setFlagZ(boolean value) { if(value) CC |= CC_Z; else CC &= ~CC_Z; }
@@ -104,4 +113,12 @@ public class Register {
         System.out.printf("A=%02X B=%02X D=%04X X=%04X Y=%04X PC=%04X SP=%04X CC=%02X%n",
                 A,B,getD(),X,Y,PC,SP,CC);
     }
+    public byte getFlags(){
+        return flags;
+    }
+    public void setFlags(byte flags){
+        this.flags=flags;
+    }
 }
+
+

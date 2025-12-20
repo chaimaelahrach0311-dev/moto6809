@@ -4,7 +4,7 @@ public class ROM {
     private byte[] memoire;
 
     public ROM(byte[] programme) {
-        int tailleROM = 1024;
+        int tailleROM = 1024; // 0xFC00–0xFFFF inclus
         memoire = new byte[tailleROM];
 
         // Remplir par défaut avec 0xFF
@@ -16,7 +16,6 @@ public class ROM {
             if (programme.length > tailleROM) {
                 throw new IllegalArgumentException("ROM dépasse 1024 octets.");
             }
-            // On écrit simplement à partir de l'index 0
             for (int i = 0; i < programme.length; i++) {
                 memoire[i] = programme[i];
             }
@@ -25,10 +24,10 @@ public class ROM {
 
     public byte read(short adresse) {
         int adr = adresse & 0xFFFF;
-        if (adr >= 0xFC00 && adr <= 0xFFFF) {
-            int pos = adr - 0xFC00;
+        if (adr >= 0xFC00 && adr <= 0xFFFF) {   // ✅ inclut 0xFFFF
+            int pos = adr - 0xFC00;             // 0xFC00 → 0, 0xFFFF → 1023
             return memoire[pos];
         }
-        return (byte) 0xFF;
+        return (byte) 0xFF; // hors ROM → 0xFF
     }
 }
