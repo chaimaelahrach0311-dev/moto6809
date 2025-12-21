@@ -128,13 +128,6 @@ public class Cpu {
             case 0xD0: subB(mem.read((short) fetch8())); break;
             case 0xF0: subB(mem.read((short) fetch16())); break;
 
-            // MUL :Multiplie A × B ,Résultat sur D (16 bits)
-            case 0x3D:
-                int res = reg.getA() * reg.getB();
-                reg.setD(res);
-                reg.updateNZFlags16(res);
-                break;
-
             // CMP A:ne modifie rien, seulement les flags
             case 0x81: cmpA(fetch8()); break;
             case 0x91: cmpA(mem.read((short) fetch8())); break;
