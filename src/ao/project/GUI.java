@@ -478,7 +478,7 @@ public class GUI {
 
         ramWindow.setVisible(true);
         ramWindow.toFront();
-        refreshRamDisplay(); // ✅ AJOUT : rafraîchir immédiatement
+        refreshRamDisplay();
     }
 
     private static void showRomWindow() {
@@ -488,7 +488,7 @@ public class GUI {
             romWindow.setSize(220, 300);
             romWindow.setLocation(950, 130);
 
-            romTextArea = new JTextArea(); // ✅ AJOUT
+            romTextArea = new JTextArea();
             romTextArea.setEditable(false);
             romTextArea.setFont(new Font("ARIAL", Font.PLAIN, 14));
             romTextArea.setBackground(Color.WHITE);
@@ -498,7 +498,7 @@ public class GUI {
 
         romWindow.setVisible(true);
         romWindow.toFront();
-        refreshRomDisplay(); // ✅ AJOUT : rafraîchir immédiatement
+        refreshRomDisplay();
     }
 
     private static void refreshRegisters() {
@@ -519,7 +519,7 @@ public class GUI {
     }
 
     private static void assemblerCode() {
-        System.out.println("✅ assemblerCode() appelé !");
+        System.out.println("assemblerCode() appelé !");
         try {
             String code = codeArea.getText();
             if (code == null || code.trim().isEmpty()) {
@@ -535,12 +535,12 @@ public class GUI {
             for (String ligne : lignes) {
                 ligne = ligne.trim();
 
-                // ✅ Ignorer lignes vides et commentaires
+
                 if (ligne.isEmpty() || ligne.startsWith(";")) continue;
 
-                // ✅ Si END est trouvé, arrêter l'assemblage
+
                 if (ligne.toUpperCase().equals("END")) {
-                    System.out.println("✅ Directive END trouvée - Fin de l'assemblage");
+                    System.out.println("Directive END trouvée - Fin de l'assemblage");
                     break;
                 }
 
@@ -599,7 +599,7 @@ public class GUI {
         }
     }
 
-    // ✅ CORRIGÉ : Affichage RAM
+
 
 
 
@@ -623,7 +623,7 @@ public class GUI {
         ramWindow.repaint();
     }
 
-    // ✅ CORRIGÉ : Affichage ROM
+
     private static void refreshRomDisplay() {
         if (romTextArea != null && romWindow != null && romWindow.isVisible()) {
             StringBuilder sb = new StringBuilder();
