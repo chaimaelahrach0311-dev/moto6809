@@ -470,7 +470,7 @@ public class GUI {
 
             ramTextArea = new JTextArea();
             ramTextArea.setEditable(false);
-            ramTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            ramTextArea.setFont(new Font("ARIAL", Font.PLAIN, 14));
             ramTextArea.setBackground(Color.WHITE);
 
             ramWindow.add(new JScrollPane(ramTextArea));
@@ -478,7 +478,7 @@ public class GUI {
 
         ramWindow.setVisible(true);
         ramWindow.toFront();
-        refreshRamDisplay();
+        refreshRamDisplay(); // ✅ AJOUT : rafraîchir immédiatement
     }
 
     private static void showRomWindow() {
@@ -488,9 +488,9 @@ public class GUI {
             romWindow.setSize(220, 300);
             romWindow.setLocation(950, 130);
 
-            romTextArea = new JTextArea();
+            romTextArea = new JTextArea(); // ✅ AJOUT
             romTextArea.setEditable(false);
-            romTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            romTextArea.setFont(new Font("ARIAL", Font.PLAIN, 14));
             romTextArea.setBackground(Color.WHITE);
 
             romWindow.add(new JScrollPane(romTextArea));
@@ -498,7 +498,7 @@ public class GUI {
 
         romWindow.setVisible(true);
         romWindow.toFront();
-        refreshRomDisplay();
+        refreshRomDisplay(); // ✅ AJOUT : rafraîchir immédiatement
     }
 
     private static void refreshRegisters() {
@@ -519,7 +519,7 @@ public class GUI {
     }
 
     private static void assemblerCode() {
-        System.out.println("assemblerCode() appelé !");
+        System.out.println("✅ assemblerCode() appelé !");
         try {
             String code = codeArea.getText();
             if (code == null || code.trim().isEmpty()) {
@@ -534,7 +534,15 @@ public class GUI {
             int addr = 0;
             for (String ligne : lignes) {
                 ligne = ligne.trim();
+
+                // ✅ Ignorer lignes vides et commentaires
                 if (ligne.isEmpty() || ligne.startsWith(";")) continue;
+
+                // ✅ Si END est trouvé, arrêter l'assemblage
+                if (ligne.toUpperCase().equals("END")) {
+                    System.out.println("✅ Directive END trouvée - Fin de l'assemblage");
+                    break;
+                }
 
                 String[] parties = ligne.split("\\s+", 2);
                 String opcode = parties[0];
@@ -563,7 +571,7 @@ public class GUI {
                 }
             }
 
-
+            // Affichage debug
             System.out.println("ROM assemblée (" + addr + " octets) :");
             for (int i = 0; i < addr; i++) {
                 System.out.printf("%02X ", romContent[i] & 0xFF);
@@ -591,7 +599,7 @@ public class GUI {
         }
     }
 
-
+    // ✅ CORRIGÉ : Affichage RAM
 
 
 
@@ -606,15 +614,16 @@ public class GUI {
         Memoire mem = cpu.getMem();
         for (int addr = 0x0000; addr <= 0x03FF; addr++) {
             byte b = mem.read((short) addr);
-            sb.append(String.format("%04X: %02X\n", addr, b & 0xFF));
-        }
+            if (b != (byte)0xFF) {
+                sb.append(String.format("%04X: %02X\n", addr, b & 0xFF));
+            }}
         area.setText(sb.toString());
         ramWindow.add(new JScrollPane(area));
         ramWindow.revalidate();
         ramWindow.repaint();
     }
 
-  
+    // ✅ CORRIGÉ : Affichage ROM
     private static void refreshRomDisplay() {
         if (romTextArea != null && romWindow != null && romWindow.isVisible()) {
             StringBuilder sb = new StringBuilder();
@@ -622,7 +631,7 @@ public class GUI {
             for (int addr = 0xFC00; addr <= 0xFFFF; addr++) {
                 byte b = memoire.read((short) addr);
                 if (b != (byte)0xFF) { // Afficher seulement les valeurs modifiées
-                    sb.append(String.format("%04X    | %02X\n", addr, b & 0xFF));
+                    sb.append(String.format("%04X  : %02X\n", addr, b & 0xFF));
                 }
             }
 

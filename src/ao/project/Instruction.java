@@ -1,20 +1,19 @@
-package ao.project;
-
+//cmt
 //IMPORTER TOUTES LES CLASSES DE PACKAGE (ARRAYLIST,LIST)
 //Si opcode est non null, alors on applique .toUpperCase() pour mettre le //texte en majuscules.
 //Si opcode est null, alors on met une chaîne vide
 
 //Si operand est non null ==> on enlève les espaces autour avec .trim().
-//Si operand est null ==>on met ""
-//Detecte le mode d'adressage
-//info:startsWith():méthode en Java,Elle permet de vérifier si une chaîne //de caractères commence par une autre chaîne donnée.
-//Si l'operande commence par $, c’est une adresse memoire en hexadecimal.
-//On enlève le $ avec substring(1)
-//Si l’operande contient une virgule, c’est un mode indexé.
-//Méthode pour détecter les erreurs de syntaxe simple
-//info:equals():compare 2 chaines (true si identiques)
-//info:contains():vérifie si une sous-chaine est présente
-//info:isEmpty():vérifie si la chaine est vide
+/*
+ * //Si operand est null ==>on met "" //Detecte le mode d'adressage
+ * //info:startsWith():méthode en Java,Elle permet de vérifier si une chaîne
+ * //de caractères commence par une autre chaîne donnée. //Si l'operande
+ * commence par $, c’est une adresse memoire en hexadecimal. //On enlève le $
+ * avec substring(1) //Si l’operande contient une virgule, c’est un mode indexé.
+ * //Méthode pour détecter les erreurs de syntaxe simple //info:equals():compare
+ * 2 chaines (true si identiques) //info:contains():vérifie si une sous-chaine
+ * est présente //info:isEmpty():vérifie si la chaine est vide*/
+package ao.project;
 
 import java.util.*;
 
@@ -30,6 +29,10 @@ public class Instruction {
     }
 
     public String detecteMode() {
+        // END est une directive, pas une instruction
+        if (opcode.equals("END")) {
+            return "directive";
+        }
         if (operand.isEmpty()) {
             return "inherent";
         } else if (operand.startsWith("#")) {
@@ -48,7 +51,9 @@ public class Instruction {
             return "indexe";
         } else if (operand.startsWith("[")) {
             return "etendu-indirect";
-        } else if (opcode.equals("BEQ") || opcode.equals("BNE") || opcode.equals("BMI") || opcode.equals("JMP") || opcode.equals("JSR")) {
+        } else if (opcode.equals("BEQ") || opcode.equals("BNE") || opcode.equals("BMI") ||
+                opcode.equals("BRA") || opcode.equals("BPL") ||
+                opcode.equals("JMP") || opcode.equals("JSR")) {
             return "relatif";
         }
         return "Inconnu";
@@ -58,20 +63,20 @@ public class Instruction {
         String mode = detecteMode();
 
         switch (opcode) {
-            //  CONTRÔLE
+            // CONTRÔLE
             case "NOP": code = "12"; break;
             case "RTS": code = "39"; break;
-            case "RTI": code = "3B"; break;
             case "SWI": code = "3F"; break;
-            case "SWI2": code = "10 3F"; break;
-            case "SWI3": code = "11 3F"; break;
+            case "END": code = ""; break; // END n'a pas d'opcode
 
-            // BRANCHES CONDITIONNELLES (3 instructions)
+            // BRANCHES CONDITIONNELLES
             case "BEQ": code = "27"; break;
             case "BNE": code = "26"; break;
             case "BMI": code = "2B"; break;
+            case "BRA": code = "20"; break;
+            case "BPL": code = "2A"; break;
 
-            //  REGISTRES (Inherent)
+            // REGISTRES (Inherent)
             case "INCA": code = "4C"; break;
             case "DECA": code = "4A"; break;
             case "CLRA": code = "4F"; break;
@@ -89,27 +94,23 @@ public class Instruction {
             case "PSHU": code = "36"; break;
             case "PULU": code = "37"; break;
 
-            //  LDA
+            // LDA
             case "LDA":
                 switch(mode) {
                     case "immediat": code = "86"; break;
                     case "direct": code = "96"; break;
                     case "etendu": code = "B6"; break;
-                    case "etendu-indirect": code = "9F"; break;
                     case "indexe": code = "A6"; break;
-                    case "indexe-indirect": code = "A6"; break;
                 }
                 break;
 
-            //  LDB
+            // LDB
             case "LDB":
                 switch(mode) {
                     case "immediat": code = "C6"; break;
                     case "direct": code = "D6"; break;
                     case "etendu": code = "F6"; break;
-                    case "etendu-indirect": code = "D6"; break;
                     case "indexe": code = "E6"; break;
-                    case "indexe-indirect": code = "E6"; break;
                 }
                 break;
 
@@ -119,65 +120,64 @@ public class Instruction {
                     case "immediat": code = "8E"; break;
                     case "direct": code = "9E"; break;
                     case "etendu": code = "BE"; break;
-                    case "etendu-indirect": code = "9E"; break;
                     case "indexe": code = "AE"; break;
-                    case "indexe-indirect": code = "AE"; break;
                 }
                 break;
 
-            //  STX
+            // LDY
+            case "LDY":
+                switch(mode) {
+                    case "immediat": code = "10 8E"; break;
+                    case "direct": code = "10 9E"; break;
+                    case "etendu": code = "10 BE"; break;
+                    case "indexe": code = "10 AE"; break;
+                }
+                break;
+
+            // STX
             case "STX":
                 switch(mode) {
                     case "direct": code = "9F"; break;
                     case "etendu": code = "BF"; break;
-                    case "etendu-indirect": code = "9F"; break;
                     case "indexe": code = "AF"; break;
-                    case "indexe-indirect": code = "AF"; break;
                 }
                 break;
 
-            //  STA
+            // STA
             case "STA":
                 switch(mode) {
                     case "direct": code = "97"; break;
                     case "etendu": code = "B7"; break;
-                    case "etendu-indirect": code = "97"; break;
                     case "indexe": code = "A7"; break;
-                    case "indexe-indirect": code = "A7"; break;
                 }
                 break;
 
-            //  STB
+            // STB
             case "STB":
                 switch(mode) {
                     case "direct": code = "D7"; break;
                     case "etendu": code = "F7"; break;
                     case "indexe": code = "E7"; break;
-                    case "indexe-indirect": code = "E7"; break;
                 }
                 break;
 
-            //  ADDA
+            // ADDA
             case "ADDA":
                 switch(mode) {
                     case "immediat": code = "8B"; break;
                     case "direct": code = "9B"; break;
                     case "etendu": code = "BB"; break;
-                    case "etendu-indirect": code = "9B"; break;
                     case "indexe": code = "AB"; break;
-                    case "indexe-indirect": code = "AB"; break;
                 }
                 break;
 
-            //  ADDB
+            // ADDB
             case "ADDB":
                 switch(mode) {
                     case "immediat": code = "CB"; break;
                     case "direct": code = "DB"; break;
                     case "etendu": code = "FB"; break;
-                    case "etendu-indirect": code = "DB"; break;
                     case "indexe": code = "EB"; break;
-                    case "indexe-indirect": code = "EB"; break;
                 }
                 break;
 
@@ -187,9 +187,7 @@ public class Instruction {
                     case "immediat": code = "80"; break;
                     case "direct": code = "90"; break;
                     case "etendu": code = "B0"; break;
-                    case "etendu-indirect": code = "90"; break;
                     case "indexe": code = "A0"; break;
-                    case "indexe-indirect": code = "A0"; break;
                 }
                 break;
 
@@ -199,9 +197,7 @@ public class Instruction {
                     case "immediat": code = "C0"; break;
                     case "direct": code = "D0"; break;
                     case "etendu": code = "F0"; break;
-                    case "etendu-indirect": code = "D0"; break;
                     case "indexe": code = "E0"; break;
-                    case "indexe-indirect": code = "E0"; break;
                 }
                 break;
 
@@ -214,36 +210,30 @@ public class Instruction {
                     case "immediat": code = "81"; break;
                     case "direct": code = "91"; break;
                     case "etendu": code = "B1"; break;
-                    case "etendu-indirect": code = "91"; break;
                     case "indexe": code = "A1"; break;
-                    case "indexe-indirect": code = "A1"; break;
                 }
                 break;
 
-            //  CMPB
+            // CMPB
             case "CMPB":
                 switch(mode) {
                     case "immediat": code = "C1"; break;
                     case "direct": code = "D1"; break;
                     case "etendu": code = "F1"; break;
-                    case "etendu-indirect": code = "D1"; break;
                     case "indexe": code = "E1"; break;
-                    case "indexe-indirect": code = "E1"; break;
                 }
                 break;
 
-            // JMP (Jump)
+            // JMP
             case "JMP":
                 switch(mode) {
                     case "direct": code = "0E"; break;
                     case "etendu": code = "7E"; break;
                     case "indexe": code = "6E"; break;
-                    case "etendu-indirect": code = "9E"; break;
-                    case "indexe-indirect": code = "6E"; break;
                 }
                 break;
 
-            //  JSR
+            // JSR
             case "JSR":
                 switch(mode) {
                     case "direct": code = "9D"; break;
@@ -258,21 +248,17 @@ public class Instruction {
                     case "immediat": code = "84"; break;
                     case "direct": code = "94"; break;
                     case "etendu": code = "B4"; break;
-                    case "etendu-indirect": code = "94"; break;
                     case "indexe": code = "A4"; break;
-                    case "indexe-indirect": code = "A4"; break;
                 }
                 break;
 
-            //  ANDB
+            // ANDB
             case "ANDB":
                 switch(mode) {
                     case "immediat": code = "C4"; break;
                     case "direct": code = "D4"; break;
                     case "etendu": code = "F4"; break;
-                    case "etendu-indirect": code = "D4"; break;
                     case "indexe": code = "E4"; break;
-                    case "indexe-indirect": code = "E4"; break;
                 }
                 break;
 
@@ -282,45 +268,17 @@ public class Instruction {
                     case "immediat": code = "8A"; break;
                     case "direct": code = "9A"; break;
                     case "etendu": code = "BA"; break;
-                    case "etendu-indirect": code = "9A"; break;
                     case "indexe": code = "AA"; break;
-                    case "indexe-indirect": code = "AA"; break;
                 }
                 break;
 
-            //  ORB
+            // ORB
             case "ORB":
                 switch(mode) {
                     case "immediat": code = "CA"; break;
                     case "direct": code = "DA"; break;
                     case "etendu": code = "FA"; break;
-                    case "etendu-indirect": code = "DA"; break;
                     case "indexe": code = "EA"; break;
-                    case "indexe-indirect": code = "EA"; break;
-                }
-                break;
-
-            //  EORA
-            case "EORA":
-                switch(mode) {
-                    case "immediat": code = "88"; break;
-                    case "direct": code = "98"; break;
-                    case "etendu": code = "B8"; break;
-                    case "etendu-indirect": code = "98"; break;
-                    case "indexe": code = "A8"; break;
-                    case "indexe-indirect": code = "A8"; break;
-                }
-                break;
-
-            //  EORB
-            case "EORB":
-                switch(mode) {
-                    case "immediat": code = "C8"; break;
-                    case "direct": code = "D8"; break;
-                    case "etendu": code = "F8"; break;
-                    case "etendu-indirect": code = "D8"; break;
-                    case "indexe": code = "E8"; break;
-                    case "indexe-indirect": code = "E8"; break;
                 }
                 break;
         }
@@ -368,11 +326,15 @@ public class Instruction {
                 if (!operand.isEmpty()) return false;
                 break;
 
+            case "directive":
+                // END ne nécessite pas de validation d'opérande
+                break;
+
             default:
                 return false;
         }
 
-        return !getOpcodeHex().isEmpty();
+        return !getOpcodeHex().isEmpty() || opcode.equals("END");
     }
 
     public String getMessageErreur() {
@@ -387,15 +349,22 @@ public class Instruction {
             return new byte[0];
         }
 
+        // END ne génère aucun code machine
+        if (opcode.equals("END")) {
+            return new byte[0];
+        }
+
         String opHex = getOpcodeHex().trim();
         List<Byte> octs = new ArrayList<>();
 
-        // Gestion SWI2 / SWI3
+        // Ajouter l'opcode
         if (opHex.contains(" ")) {
+            // Pour LDY (opcodes sur 2 octets)
             for (String part : opHex.split(" ")) {
                 octs.add((byte) Integer.parseInt(part, 16));
             }
         } else {
+            // Opcode simple (1 octet)
             octs.add((byte) Integer.parseInt(opHex, 16));
         }
 
@@ -404,12 +373,11 @@ public class Instruction {
 
         switch (mode) {
             case "immediat":
-                // Gérer #44 et #$44
                 String immVal = operand.substring(1).replace("$", "");
                 if (immVal.length() == 2) {
                     octs.add((byte) Integer.parseInt(immVal, 16));
                 } else if (immVal.length() == 4) {
-                    // Pour LDX #$1234 (16 bits) - BIG ENDIAN
+                    // Pour LDX #$1234, LDY #$5678 (16 bits) - BIG ENDIAN
                     octs.add((byte) Integer.parseInt(immVal.substring(0, 2), 16)); // high
                     octs.add((byte) Integer.parseInt(immVal.substring(2, 4), 16)); // low
                 }
@@ -427,31 +395,33 @@ public class Instruction {
 
             case "etendu":
                 if (cleanOpcd.length() == 2) {
-                    // Adresse courte $05 / devient $0005
+                    // Adresse courte $05 =>devient $0005
                     octs.add((byte) 0x00); // high = 00
-                    octs.add((byte) Integer.parseInt(cleanOpcd, 16)); // low
+                    octs.add((byte) Integer.parseInt(cleanOpcd, 16)); // bas
                 } else if (cleanOpcd.length() == 4) {
-                    // occct haut
-                    octs.add((byte) Integer.parseInt(cleanOpcd.substring(0, 2), 16)); // high
-                    octs.add((byte) Integer.parseInt(cleanOpcd.substring(2, 4), 16)); // low
+                    // oct haut
+                    octs.add((byte) Integer.parseInt(cleanOpcd.substring(0, 2), 16)); // haut
+                    octs.add((byte) Integer.parseInt(cleanOpcd.substring(2, 4), 16)); // bas
                 }
                 break;
 
             case "indexe":
                 if (operand.equals(",X")) {
                     octs.add((byte) 0x84);
+                } else if (operand.equals(",Y")) {
+                    octs.add((byte) 0xA4);
                 } else if (operand.contains(",")) {
                     String offsetStr = operand.split(",")[0].replace("$", "");
                     if (!offsetStr.isEmpty()) {
                         try {
                             octs.add((byte) Integer.parseInt(offsetStr, 16));
-                        } catch (Exception e) {  }
+                        } catch (Exception e) { }
                     }
                 }
                 break;
 
             case "relatif":
-
+                // Pour BEQ, BNE, BMI, BRA, BPL
                 octs.add((byte) 0x00);
                 break;
         }
