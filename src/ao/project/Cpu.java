@@ -78,7 +78,7 @@ public class Cpu {
                     halted = true; //On arrête le CPU immédiatement
                      }
                 break;}
-            // STA ::Écrit le contenu de B dans la mémoire
+            // STA ::Écrit le contenu de A dans la mémoire
             case 0x97: mem.write((short) fetch8(), (byte) reg.getA()); break;// DIrect
             case 0xB7: mem.write((short) fetch16(), (byte) reg.getA()); break;//ETENDU
             case 0xA7: { // Indexé (exemple opcode A7)

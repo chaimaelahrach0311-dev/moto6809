@@ -33,9 +33,6 @@ public class Register {
     public int getB() { return B; }
     public void setB(int b) { B = b & 0xFF; }
 
-    public int getD() { return (A << 8) | (B & 0xFF); }
-    public void setD(int d) { A = (d >> 8) & 0xFF; B = d & 0xFF; }
-
     public int getX() { return X; }
     public void setX(int x) { X = x & 0xFFFF; }
 
@@ -110,8 +107,8 @@ public class Register {
     }
 
     public void printState() {
-        System.out.printf("A=%02X B=%02X D=%04X X=%04X Y=%04X PC=%04X SP=%04X CC=%02X%n",
-                A,B,getD(),X,Y,PC,SP,CC);
+        System.out.printf("A=%02X B=%02X X=%04X Y=%04X PC=%04X SP=%04X CC=%02X%n",
+                A,B,X,Y,PC,SP,CC);
     }
     public byte getFlags(){
         return flags;
@@ -120,5 +117,3 @@ public class Register {
         this.flags=flags;
     }
 }
-
-
