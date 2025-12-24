@@ -35,12 +35,7 @@ public class Cpu {
     private int fetch16() {//lire 2 octets(format big endian)
         int hi = fetch8();//lire l’octet de poids fort
         int lo = fetch8();//lire l’octet de poids faible
-        return (hi << 8) | lo;// fais un decalage 8 bits si onpas le fais il va lire une autre instruction
-        //           00010010 00000000        (12)
-        // lo       = 00000000 00110100        (34)
-        //       -----------------------------
-        //       result   = 00010010 00110100
-        //Résultat = 0x1234
+        return (hi << 8) | lo;
     }
     private void branchIf(boolean condition) {
         int offset = fetch8();

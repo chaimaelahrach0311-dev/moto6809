@@ -387,7 +387,6 @@ public class Instruction {
                 octs.add((byte) 0x00);
                 break;
         }
-
         byte[] result = new byte[octs.size()];
         for (int i = 0; i < octs.size(); i++) {
             result[i] = octs.get(i);
