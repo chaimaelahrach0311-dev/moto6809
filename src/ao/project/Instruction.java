@@ -14,9 +14,7 @@
  * 2 chaines (true si identiques) //info:contains():vérifie si une sous-chaine
  * est présente //info:isEmpty():vérifie si la chaine est vide*/
 package ao.project;
-
 import java.util.*;
-
 public class Instruction {
     public final String opcode;
     public final String operand;
