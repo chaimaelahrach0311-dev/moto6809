@@ -14,9 +14,7 @@
  * 2 chaines (true si identiques) //info:contains():vérifie si une sous-chaine
  * est présente //info:isEmpty():vérifie si la chaine est vide*/
 package ao.project;
-
 import java.util.*;
-
 public class Instruction {
     public final String opcode;
     public final String operand;
@@ -65,7 +63,6 @@ public class Instruction {
         switch (opcode) {
             // CONTRÔLE
             case "NOP": code = "12"; break;
-            case "RTS": code = "39"; break;
             case "SWI": code = "3F"; break;
             case "END": code = ""; break; // END n'a pas d'opcode
 
@@ -84,15 +81,8 @@ public class Instruction {
             case "COMA": code = "43"; break;
             case "COMB": code = "53"; break;
 
-            // TRANSFERT/ÉCHANGE
-            case "TFR": code = "1F"; break;
-            case "EXG": code = "1E"; break;
 
-            //  PILE
-            case "PSHS": code = "34"; break;
-            case "PULS": code = "35"; break;
-            case "PSHU": code = "36"; break;
-            case "PULU": code = "37"; break;
+
 
             // LDA
             case "LDA":
@@ -201,8 +191,7 @@ public class Instruction {
                 }
                 break;
 
-            //  MUL
-            case "MUL": code = "3D"; break;
+
 
             //  CMPA
             case "CMPA":
@@ -233,14 +222,7 @@ public class Instruction {
                 }
                 break;
 
-            // JSR
-            case "JSR":
-                switch(mode) {
-                    case "direct": code = "9D"; break;
-                    case "etendu": code = "BD"; break;
-                    case "indexe": code = "AD"; break;
-                }
-                break;
+
 
             //  ANDA
             case "ANDA":
@@ -259,26 +241,6 @@ public class Instruction {
                     case "direct": code = "D4"; break;
                     case "etendu": code = "F4"; break;
                     case "indexe": code = "E4"; break;
-                }
-                break;
-
-            // ORA
-            case "ORA":
-                switch(mode) {
-                    case "immediat": code = "8A"; break;
-                    case "direct": code = "9A"; break;
-                    case "etendu": code = "BA"; break;
-                    case "indexe": code = "AA"; break;
-                }
-                break;
-
-            // ORB
-            case "ORB":
-                switch(mode) {
-                    case "immediat": code = "CA"; break;
-                    case "direct": code = "DA"; break;
-                    case "etendu": code = "FA"; break;
-                    case "indexe": code = "EA"; break;
                 }
                 break;
         }
@@ -425,7 +387,6 @@ public class Instruction {
                 octs.add((byte) 0x00);
                 break;
         }
-
         byte[] result = new byte[octs.size()];
         for (int i = 0; i < octs.size(); i++) {
             result[i] = octs.get(i);
