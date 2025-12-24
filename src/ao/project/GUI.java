@@ -1,12 +1,13 @@
 package ao.project;
-
 import java.awt.*;
+import java.io.*;
 import javax.swing.*;
-
+import javax.swing.filechooser.FileNameExtensionFilter;
 public class GUI {
 
     private static JTextArea codeArea;
     private static JFrame programDisplayFrame;
+    private static JTextArea programDisplayArea;
     private static JFrame ramWindow;
     private static JFrame romWindow;
     private static Memoire memoire;
@@ -35,7 +36,7 @@ public class GUI {
         cpu = new Cpu(memoire, reg);
         cpu.reset();
 
-        // === 1. Fenêtre principale : MENU + BARRE D'OUTILS ===
+        // Fenêtre principale : MENU + BARRE D'OUTILS ===
         JFrame menuFrame = new JFrame("MOTO6809 - Menu");
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setSize(2000, 120);
@@ -45,8 +46,23 @@ public class GUI {
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("Fichier");
         fileMenu.add(new JMenuItem("Nouveau"));
-        fileMenu.add(new JMenuItem("Ouvrir"));
-        fileMenu.add(new JMenuItem("Enregistrer"));
+
+        // Menu Ouvrir
+        JMenuItem ouvrirMenuItem = new JMenuItem("Ouvrir");
+        ouvrirMenuItem.addActionListener(e -> {
+            System.out.println("🔵 Menu Ouvrir cliqué !");
+            ouvrirFichier();
+        });
+        fileMenu.add(ouvrirMenuItem);
+
+        //  Menu Enregistrer
+        JMenuItem enregistrerMenuItem = new JMenuItem("Enregistrer");
+        enregistrerMenuItem.addActionListener(e -> {
+            System.out.println("🔵 Menu Enregistrer cliqué !");
+            enregistrerFichier();
+        });
+        fileMenu.add(enregistrerMenuItem);
+
         fileMenu.add(new JMenuItem("Enregistrer sous..."));
         fileMenu.addSeparator();
         fileMenu.add(new JMenuItem("Imprimer"));
@@ -107,12 +123,23 @@ public class GUI {
         menuFrame.setJMenuBar(menuBar);
 
         JToolBar toolBar = new JToolBar();
+
+        //  Bouton Ouvrir
         JButton openBtn = new JButton("📂");
         openBtn.setToolTipText("Ouvrir un programme assembleur");
+        openBtn.addActionListener(e -> {
+            System.out.println("🔵 Bouton Ouvrir cliqué !");
+            ouvrirFichier();
+        });
         toolBar.add(openBtn);
 
+        //  Bouton Enregistrer
         JButton saveBtn = new JButton("💾");
         saveBtn.setToolTipText("Enregistrer le programme actuel");
+        saveBtn.addActionListener(e -> {
+            System.out.println("🔵 Bouton Enregistrer cliqué !");
+            enregistrerFichier();
+        });
         toolBar.add(saveBtn);
 
         JButton printBtn = new JButton("🖨");
@@ -389,7 +416,7 @@ public class GUI {
         registersFrame.add(mainPanel);
         registersFrame.setVisible(true);
 
-        // === 3. Fenêtre : PROGRAMME (Éditeur) ===
+        //  PROGRAMME (Éditeur) ===
         JFrame programFrame = new JFrame("Edit...");
         programFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         programFrame.setSize(250, 300);
@@ -429,15 +456,137 @@ public class GUI {
         programFrame.add(editorToolBar, BorderLayout.NORTH);
 
         codeArea = new JTextArea();
-        codeArea.setFont(new Font("Arial", Font.PLAIN, 14));
-        codeArea.setLineWrap(true);
-        codeArea.setWrapStyleWord(true);
+        codeArea.setFont(new Font("Courier New", Font.PLAIN, 14));
+        codeArea.setLineWrap(false);
         codeArea.setBackground(Color.PINK);
         codeArea.setForeground(Color.BLACK);
         codeArea.setOpaque(true);
 
         programFrame.add(new JScrollPane(codeArea), BorderLayout.CENTER);
         programFrame.setVisible(true);
+    }
+
+
+    //  MÉTHODE OUVRIR FICHIER
+
+    private static void ouvrirFichier() {
+        System.out.println("✅ ouvrirFichier() appelée");
+
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Fichiers Assembleur (*.asm, *.s, *.txt)", "asm", "s", "txt");
+            fileChooser.setFileFilter(filter);
+            fileChooser.setAcceptAllFileFilterUsed(true);
+
+            fileChooser.setDialogTitle("Ouvrir un programme assembleur");
+
+            int resultat = fileChooser.showOpenDialog(null);
+
+            if (resultat == JFileChooser.APPROVE_OPTION) {
+                File fichier = fileChooser.getSelectedFile();
+                System.out.println("📁 Fichier sélectionné : " + fichier.getAbsolutePath());
+
+                if (!fichier.exists()) {
+                    JOptionPane.showMessageDialog(null,
+                            "Le fichier n'existe pas !",
+                            "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String contenu = lireFichier(fichier);
+
+                if (codeArea != null) {
+                    codeArea.setText(contenu);
+                    System.out.println("✅ Contenu chargé dans l'éditeur");
+                }
+
+                JOptionPane.showMessageDialog(null,
+                        "Fichier chargé avec succès !\n" +
+                                "Fichier : " + fichier.getName() + "\n" +
+                                "Lignes : " + contenu.split("\n").length,
+                        "Succès",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erreur lors de l'ouverture du fichier :\n" + ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    // MÉTHODE LIRE FICHIER
+
+    private static String lireFichier(File fichier) throws IOException {
+        StringBuilder contenu = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fichier))) {
+            String ligne;
+            while ((ligne = reader.readLine()) != null) {
+                contenu.append(ligne).append("\n");
+            }
+        }
+
+        return contenu.toString();
+    }
+
+
+    //MÉTHODE ENREGISTRER FICHIER
+
+    private static void enregistrerFichier() {
+        System.out.println("✅ enregistrerFichier() appelée");
+
+        if (codeArea == null || codeArea.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null,
+                    "Rien à enregistrer !",
+                    "Attention",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+
+            FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                    "Fichiers Assembleur (*.asm)", "asm");
+            fileChooser.setFileFilter(filter);
+            fileChooser.setDialogTitle("Enregistrer le programme");
+
+            int resultat = fileChooser.showSaveDialog(null);
+
+            if (resultat == JFileChooser.APPROVE_OPTION) {
+                File fichier = fileChooser.getSelectedFile();
+
+                if (!fichier.getName().toLowerCase().endsWith(".asm")) {
+                    fichier = new File(fichier.getAbsolutePath() + ".asm");
+                }
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(fichier))) {
+                    writer.write(codeArea.getText());
+                }
+
+                JOptionPane.showMessageDialog(null,
+                        "Fichier enregistré avec succès !\n" + fichier.getName(),
+                        "Succès",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Erreur lors de l'enregistrement :\n" + ex.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static void showProgramWindow() {
@@ -447,16 +596,21 @@ public class GUI {
             programDisplayFrame.setSize(300, 250);
             programDisplayFrame.setLocation(400, 200);
 
-            JTextArea displayArea = new JTextArea();
-            displayArea.setEditable(false);
-            displayArea.setFont(new Font("ARIAL", Font.PLAIN, 14));
-            displayArea.setBackground(Color.WHITE);
-            displayArea.setText(codeArea.getText());
-            displayArea.setLineWrap(true);
-            displayArea.setWrapStyleWord(true);
+            programDisplayArea = new JTextArea();
+            programDisplayArea.setEditable(false);
+            programDisplayArea.setFont(new Font("ARIAL", Font.PLAIN, 14));
+            programDisplayArea.setBackground(Color.WHITE);
+            programDisplayArea.setLineWrap(true);
+            programDisplayArea.setWrapStyleWord(true);
 
-            programDisplayFrame.add(new JScrollPane(displayArea));
+            programDisplayFrame.add(new JScrollPane(programDisplayArea));
         }
+
+        // MISE À JOUR DU CONTENU + AFFICHAGE
+        if (programDisplayArea != null && codeArea != null) {
+            programDisplayArea.setText(codeArea.getText());
+        }
+
         programDisplayFrame.setVisible(true);
         programDisplayFrame.toFront();
     }
@@ -518,8 +672,14 @@ public class GUI {
         flagsField.setText(flags);
     }
 
+    private static void refreshProgramDisplay() {
+        if (programDisplayArea != null && programDisplayFrame != null && programDisplayFrame.isVisible()) {
+            programDisplayArea.setText(codeArea.getText());
+        }
+    }
+
     private static void assemblerCode() {
-        System.out.println("assemblerCode() appelé !");
+        System.out.println(" assemblerCode() appelé !");
         try {
             String code = codeArea.getText();
             if (code == null || code.trim().isEmpty()) {
@@ -535,12 +695,12 @@ public class GUI {
             for (String ligne : lignes) {
                 ligne = ligne.trim();
 
-
+                //  Ignorer lignes vides et commentaires
                 if (ligne.isEmpty() || ligne.startsWith(";")) continue;
 
-
+                // Si END est trouvé, arrêter l'assemblage
                 if (ligne.toUpperCase().equals("END")) {
-                    System.out.println("Directive END trouvée - Fin de l'assemblage");
+                    System.out.println("✅ Directive END trouvée - Fin de l'assemblage");
                     break;
                 }
 
@@ -599,7 +759,7 @@ public class GUI {
         }
     }
 
-
+    //  Affichage RAM
 
 
 
@@ -623,7 +783,7 @@ public class GUI {
         ramWindow.repaint();
     }
 
-
+    //  Affichage ROM
     private static void refreshRomDisplay() {
         if (romTextArea != null && romWindow != null && romWindow.isVisible()) {
             StringBuilder sb = new StringBuilder();
@@ -641,4 +801,5 @@ public class GUI {
             romTextArea.setText(sb.toString());
         }
     }
+
 }
